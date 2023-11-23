@@ -1,9 +1,14 @@
 import { ICountriesItem } from '../../types';
 import { FC } from 'react';
 
-const CountriesItem: FC<ICountriesItem> = ({name, flag}) => {
+const CountriesItem: FC<ICountriesItem> = ({name, flag, onClick}) => {
+
+  const handleClick=()=>{
+    onClick(name)
+  }
+
   return (
-    <div>
+    <div onClick={handleClick} className="d-flex justify-content-between mb-2 border border-1">
       <span className="text text-black">{name}</span>
       <img src={flag} alt={`${name}'s flag`} style={{maxWidth: '30px', maxHeight: 'auto'}}/>
     </div>
