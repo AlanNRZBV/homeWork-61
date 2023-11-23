@@ -25,7 +25,17 @@ const CountryExpand: FC<ICountryExpand> = ({
         <span>
           <b>Population:</b> {population}
         </span>
-        <ul>{fullBorders?.map((item) => <li>{item}</li>)}</ul>
+        <span>
+          <b>Borders:</b>
+        </span>
+
+        {fullBorders && fullBorders.length !== 0 ? (
+          <ul>
+            {fullBorders?.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        ) : (
+          <span>Has no borders</span>
+        )}
       </div>
       <div>
         <img src={flag} alt={`${name}'s flag`} style={{ maxWidth: '250px' }} />

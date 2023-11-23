@@ -3,7 +3,7 @@ import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import Panel from '../../components/Panel/Panel.tsx';
 import Countries from '../../components/Countries/Countries.tsx';
 import CountryExpand from '../../components/Countries/CountryExpand.tsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   IApiCountries,
   IApiCountry,
@@ -18,7 +18,8 @@ const ALL_URL = 'all?fields=alpha3Code,flag,name';
 
 const App = () => {
   const [countries, setCountries] = useState<ICountriesItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useRef({countries: true, country: true})
   const [isSelected, setIsSelected] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [country, setCountry] = useState<ICountryExpand[]>([]);
@@ -26,12 +27,12 @@ const App = () => {
 
   useEffect(() => {
     const fetchCountriesData = async () => {
-      setIsLoading(true);
+      isLoading.current['countries']=false
+      // setIsLoading(true);
       try {
         const countriesResponse = await axios.get<IApiCountries[]>(
           BASE_URl + ALL_URL,
         );
-        console.log(countriesResponse);
         const newCountries = countriesResponse.data;
         const countriesItems: ICountriesItem[] = newCountries.map((item) => ({
           name: item.name,
@@ -42,7 +43,7 @@ const App = () => {
       } catch (e) {
         console.log('Caught error while fetching all countries data ' + e);
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
     void fetchCountriesData();
@@ -50,6 +51,7 @@ const App = () => {
 
   useEffect(() => {
     if (selectedCountry !== '') {
+      isLoading.current.country = false
       const fetchCountryData = async () => {
         try {
           const countryResponse = await axios.get<IApiCountry[]>(
@@ -103,7 +105,7 @@ const App = () => {
         <Row>
           <Col xs={3}>
             <Panel vhMaxHeight={true}>
-              {isLoading ? (
+              {isLoading.current.countries ? (
                 <Spinner />
               ) : (
                 <>

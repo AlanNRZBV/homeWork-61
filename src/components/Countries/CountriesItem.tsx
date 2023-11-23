@@ -11,7 +11,7 @@ const CountriesItem: FC<ICountriesItem> = ({ name, flag, onClick }) => {
   return (
     <div
       onClick={handleClick}
-      className="d-flex justify-content-between mb-2 border border-1"
+      className="d-flex justify-content-between mb-2 border border-1 py-1 px-1 rounded rounded-1"
     >
       <span className="text text-black">{name}</span>
       <img
