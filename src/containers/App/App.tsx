@@ -3,18 +3,18 @@ import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import Panel from '../../components/Panel/Panel.tsx';
 import Countries from '../../components/Countries/Countries.tsx';
 import CountryExpand from '../../components/Countries/CountryExpand.tsx';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IApiCountries,
   IApiCountry,
   ICountriesItem,
   ICountryExpand,
 } from '../../types';
-import axios, { name } from 'axios';
+import axios from 'axios';
 
 const BASE_URl = 'https://restcountries.com/v2/';
 const NAME_URL = 'name/';
-const ALL_URL = 'all?fields=flag,name';
+const ALL_URL = 'all?fields=alpha3Code,flag,name';
 
 const App = () => {
   const [countries, setCountries] = useState<ICountriesItem[]>([]);
@@ -22,6 +22,7 @@ const App = () => {
   const [isSelected, setIsSelected] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [country, setCountry] = useState<ICountryExpand[]>([]);
+  const [fullBordersName, setFullBordersName] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCountriesData = async () => {
@@ -30,10 +31,12 @@ const App = () => {
         const countriesResponse = await axios.get<IApiCountries[]>(
           BASE_URl + ALL_URL,
         );
+        console.log(countriesResponse);
         const newCountries = countriesResponse.data;
         const countriesItems: ICountriesItem[] = newCountries.map((item) => ({
           name: item.name,
           flag: item.flag,
+          alpha3Code: item.alpha3Code,
         }));
         setCountries(countriesItems);
       } catch (e) {
@@ -61,18 +64,35 @@ const App = () => {
               capital: newCountry[0].capital,
               region: newCountry[0].region,
               subregion: newCountry[0].subregion,
+              borders: newCountry[0].borders,
             };
-              setCountry([countryObj]);
-              setIsSelected(true);
 
+            const getFullBordersName = () => {
+              const bordersList = countryObj.borders;
+              const fullNames = countries
+                .filter(
+                  (item) =>
+                    item.alpha3Code !== undefined &&
+                    bordersList !== undefined &&
+                    bordersList.includes(item.alpha3Code),
+                )
+                .map((item) => item.name);
+              setFullBordersName(fullNames);
+            };
+            void getFullBordersName();
+
+            setCountry([countryObj]);
+            setIsSelected(true);
           }
         } catch (e) {
-          console.log('Caught error while fetching data for selected country ' + e);
+          console.log(
+            'Caught error while fetching data for selected country ' + e,
+          );
         }
       };
       void fetchCountryData();
     }
-  }, [selectedCountry]);
+  }, [countries, selectedCountry]);
 
   const getCountryInfo = (name: string) => {
     setSelectedCountry(name);
@@ -107,6 +127,7 @@ const App = () => {
                     region={item.region}
                     subregion={item.subregion}
                     population={item.population}
+                    fullBorders={fullBordersName}
                   />
                 ))
               ) : (
